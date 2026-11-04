@@ -113,7 +113,7 @@ All counts were measured on commit `7be1eb5`.
 
 ## The ideas that make it safe (memorize these five)
 
-1. **Money is an integer number of centavos.** ₱100.00 is stored as `10000`. Integers never have rounding errors; decimals (floats) do. See [money.ts](../06-frontend/03-shared-lib-hooks-and-trpc-client.md#moneyts--the-money-rules).
+1. **Money is an integer number of centavos.** ₱100.00 is stored as `10000`. Integers never have rounding errors; decimals (floats) do. See [money.ts](../06-frontend/03-shared-lib-hooks-and-trpc-client.md#moneyts-the-money-rules).
 2. **Only the ledger changes balances.** Every deposit, transfer, bill, load, reward, goal move and Bitcoin trade calls `post()` in [`src/server/ledger.ts`](../04-server-core/04-ledger.md).
 3. **Every money movement is one database transaction.** Either every step succeeds or nothing is saved. A transfer never debits one person without crediting the other.
 4. **Balances are updated with a condition, and rows are locked.** The update says "subtract ₱100 *only if* the balance is at least ₱100", and the account row is locked (`SELECT … FOR UPDATE`) while the payment is checked. Two simultaneous payments cannot both pass.
