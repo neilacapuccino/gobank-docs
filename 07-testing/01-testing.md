@@ -39,7 +39,8 @@ On commit `7be1eb5`, in a separate copy of the project (the project itself was n
 | `npm run test:integration` (`verify-core.ts`) | **passed**: "registration, cards, PINs, Google linking, profile, payments, transfers, requests, card locks, ownership, rollback and savings" |
 | Concurrency experiment (20 simultaneous transfers) | **passed**: no overdraft, no money created or lost ([§6](#6-the-concurrency-experiment)) |
 | `npm run test:bitcoin:integration` | **not run**: the environment used to write these docs blocks the Binance and Frankfurter APIs. The script stopped at the first quote with the app's own "Bitcoin market data is unavailable" error, the graceful failure the [Bitcoin page](../05-features/12-bitcoin.md) describes. Run it on a normal internet connection |
-| `npm run test:e2e` | **not run** (needs Google Chrome and the dev server); run it locally before the defense |
+| `npm run test:e2e` | **3 / 3 passed** against the dev server and the local database. The project's config asks for Google Chrome (`channel: "chrome"`), which the writing environment does not have, so the run used a one-off copy of the config that only swaps in the pre-installed Chromium (same 3 tests, same Pixel 7 device). Run it once more with the real config before the defense |
+| Extra browser checks (Playwright scripts, Chromium) | the balance card (hide, copy refused without clipboard permission), the GO menu (focus, Tab, Escape, scroll lock, reduced motion) and the session rules (reload, typed address, second tab, in-app link) behave as the catalog pages [06](../10-feature-catalog/06-sessions-and-sign-out.md), [11](../10-feature-catalog/11-dashboard.md) and [12](../10-feature-catalog/12-go-menu.md) describe |
 
 ---
 
@@ -654,7 +655,7 @@ Not part of the project, but included in this docs repository: [`experiments/con
 
 The tests find elements **by role and label** (`getByRole("button", { name: "Continue" })`, `getByLabel("Amount")`), the way a screen reader would. A missing label would make the test fail, so they double as an accessibility check. Commit `3548fbe` made the third test continue from the recipient search instead of clicking a name, which is more reliable.
 
-Configuration (`playwright.config.ts`): a Pixel 7 phone, real Google Chrome, 90 s per test, and the dev server started automatically ([Configuration files §5](../02-architecture/03-configuration-files.md#5-test-runner-settings-gobankplaywrightconfigts)).
+Configuration (`playwright.config.ts`): a Pixel 7 phone, real Google Chrome (for this review the same tests ran in Chromium, see [§2](#2-results-measured-for-these-docs)), 90 s per test, and the dev server started automatically ([Configuration files §5](../02-architecture/03-configuration-files.md#5-test-runner-settings-gobankplaywrightconfigts)).
 
 ---
 

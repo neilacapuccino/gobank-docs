@@ -150,9 +150,9 @@ All four procedures are **protected**: they always act on `ctx.userId`, so one u
 ```
 <!-- /code -->
 
-### `getOverview` (lines 9–27): everything the dashboard needs, in one query
+### `getOverview` (lines 9–27): everything the dashboard needs, in one call
 
-Username, name, photo, account number, balance, points, **how many goals** (`_count`, line 19) and the **5 latest transactions** (lines 20–25) except interest rows (`MAIN_ACCOUNT_KINDS` = kind is not `interest`, because interest belongs to goals, not the main account). Prisma turns this into a few efficient queries; the dashboard page calls it directly on the server ([Dashboard](11-dashboard-and-navigation.md)).
+Username, name, photo, account number, balance, points, **how many goals** (`_count`, line 19) and the **5 latest transactions** (lines 20–25) except interest rows (`MAIN_ACCOUNT_KINDS` = kind is not `interest`, because interest belongs to goals, not the main account). Prisma runs this one call as **two SQL statements** (captured from PostgreSQL's statement log): the first reads the user row with the goal count joined in (`LEFT JOIN (SELECT "userId", COUNT(*) … GROUP BY "userId")`), the second reads the transactions (`WHERE kind <> 'interest' AND "userId" IN (…) ORDER BY "createdAt" DESC, id DESC LIMIT 5`). The dashboard page calls it directly on the server ([Dashboard](11-dashboard-and-navigation.md)).
 
 ### `getSpending` (lines 29–55): what payment forms need
 

@@ -3,7 +3,7 @@
 This repository explains **every part of the GoBank Express code**, in study order, so you can understand it deeply and defend it in front of a panel.
 
 - **Source explained:** [`neilacapuccino/gobank-express`](https://github.com/neilacapuccino/gobank-express) at commit `7be1eb5` (the `main` branch on 4 Nov 2026). The exact commit is saved in [`.docs-source.json`](.docs-source.json).
-- **Code excerpts are copied by a script, never retyped.** All 255 excerpts show the real file path and the real line numbers. Run `node scripts/sync-code.mjs --check` to prove that every excerpt still matches the source (see [Keeping these docs accurate](#keeping-these-docs-accurate)).
+- **Code excerpts are copied by a script, never retyped.** All 366 excerpts show the real file path and the real line numbers. Run `node scripts/sync-code.mjs --check` to prove that every excerpt still matches the source (see [Keeping these docs accurate](#keeping-these-docs-accurate)).
 - **Every file is accounted for.** [The file index](appendix/01-file-index.md) lists all 258 files in the project, the category each belongs to, and the page that explains it.
 - **Behavior was verified, not assumed.** See [What was verified](#what-was-verified).
 
@@ -98,6 +98,12 @@ If you only have one evening, read the pages marked ⭐.
 | ⭐ [Limitations and future work](09-defense/03-limitations-and-future-work.md) | Honest weaknesses and how you would fix them |
 | ⭐ [Cheat sheet](09-defense/04-cheat-sheet.md) | Every number, limit and rule on one page |
 
+### 10. Feature catalog: one page per feature
+| Page | What it covers |
+| --- | --- |
+| ⭐ [Feature catalog index](10-feature-catalog/README.md) | All 39 features, each on its own page with the same layout: what the user can do, how it works, a structure diagram, every file and its location, the frontend and backend code, the database tables, **the complicated parts explained step by step with worked examples**, rules, messages and tests. Also maps every route and every API procedure to its feature |
+| [Shared systems](10-feature-catalog/00-shared-systems.md) | The parts every feature uses: the API pipeline, sessions, the ledger, errors, validation, caching, IDs, money formats and the UI kit |
+
 ### Appendix
 | Page | What it covers |
 | --- | --- |
@@ -137,9 +143,11 @@ While writing this guide, the source code was not only read but **run**, on an u
 | 20 simultaneous transfers ([experiment](experiments/concurrent-transfers.ts)) | 12 succeed, 8 refused, no money created or lost |
 | Worked examples (interest, Bitcoin, Luhn, formats) | computed by running the project's own functions |
 | The SQL shown for the ledger | captured from PostgreSQL's statement log |
-| Live Bitcoin integration test and browser tests | **not run** (the writing environment blocks the market APIs and has no Google Chrome); run them locally |
+| Browser tests (`npm run test:e2e`) | **3 / 3 pass** in Chromium (the config's Google Chrome is not installed here, so a copy of the config swapped in Chromium) |
+| The app in a real browser | the balance card, the GO menu (focus, Escape, scroll lock, reduced motion) and the session rules (reload, typed address, second tab) checked with Playwright scripts |
+| Live Bitcoin integration test | **not run** (the writing environment blocks the market APIs); run it locally |
 
-The pages themselves are checked too: every excerpt matches the source (`sync-code.mjs --check`), every project file is mentioned (`--coverage`), all internal links and `#anchors` resolve (`check-links.mjs`), and all 21 diagrams parse with Mermaid 11.
+The pages themselves are checked too: every excerpt matches the source (`sync-code.mjs --check`), every project file is mentioned (`--coverage`), all internal links and `#anchors` resolve (`check-links.mjs`), and all 34 diagrams parse with Mermaid 11.
 
 ---
 

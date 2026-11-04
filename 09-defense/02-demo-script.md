@@ -45,7 +45,7 @@
 
 ### Step 3. Dashboard tour (45 s) — as `@maricel`
 - **Show:** the balance (tap the eye to hide), copy the account number, the points, quick actions, GoalSave/Bitcoin cards, recent transactions, the **GO** menu.
-- **Say:** "The dashboard is rendered on the server with one query, so there is no loading spinner."
+- **Say:** "The dashboard is rendered on the server with one database call, so there is no loading spinner."
 
 ### Step 4. Send money (2 min)
 - **Click:** Send money → type `@dante` → Continue.

@@ -53,7 +53,7 @@
 | **Contention on very popular receivers** | transfers lock the receiver's row too, so many simultaneous payments *to one account* wait in line | for merchants, credit asynchronously or use a separate ledger entry queue |
 | **Session cleanup is lazy** | expired sessions are removed when used or at the next sign-in; the close timer may not run on serverless | a scheduled cleanup job (correctness does not depend on it) |
 | **Profile photos stored in the database** | at most ~200 KB per user; fine for a prototype | object storage (for example S3) with only a URL in the database |
-| **Time zones** | the daily limit resets at Manila midnight on the server; history day labels use the device's time zone | store the user's time zone if users travel |
+| **Time zones** | the daily limit resets at Manila midnight on the server; history day labels use the device's time zone; but the dashboard's "Recent transactions" dates are formatted **on the server** (`shortDate` has no `timeZone` option), so on a UTC server a transaction at 7:30 AM Manila time shows the previous day there | pass `timeZone: "Asia/Manila"` to the date formatters; store the user's time zone if users travel |
 | **Market-data caches are per server instance** | each instance fetches its own quotes (5-second cache) | a shared cache such as Redis if traffic grows |
 
 ## 5. Testing limitations

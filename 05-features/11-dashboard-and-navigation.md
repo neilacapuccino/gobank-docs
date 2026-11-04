@@ -1,13 +1,13 @@
 # Dashboard and navigation
 
-**What you will learn:** how the home screen is built and loaded (on the server, in one query), the balance card's hide and copy features, the quick actions and feature cards, and the floating **GO** menu: a native modal dialog with an animated "unfold" opening, keyboard support and reduced-motion support.
+**What you will learn:** how the home screen is built and loaded (on the server, with one Prisma call), the balance card's hide and copy features, the quick actions and feature cards, and the floating **GO** menu: a native modal dialog with an animated "unfold" opening, keyboard support and reduced-motion support.
 
 | Layer | Files |
 | --- | --- |
 | Page | `src/app/(app)/dashboard/page.tsx` (`/dashboard`) |
 | Screen | `src/features/dashboard/components/dashboard-screen.tsx`, `balance-card.tsx`, `quick-actions.tsx`, `feature-grid.tsx` |
 | Navigation and art | `src/shared/ui/go-menu.tsx` (+ `go-menu.module.css`), `src/shared/ui/pocket-art.tsx`, `src/shared/ui/gobank-logo.tsx` |
-| Data | `account.overview` ([Account and profile](03-account-and-profile.md#getoverview-lines-927-everything-the-dashboard-needs-in-one-query)), recent activity ([Transactions](10-transactions-and-receipts.md)) |
+| Data | `account.overview` ([Account and profile](03-account-and-profile.md#getoverview-lines-927-everything-the-dashboard-needs-in-one-call)), recent activity ([Transactions](10-transactions-and-receipts.md)) |
 
 ---
 
@@ -791,7 +791,7 @@ The **G·Bank express** wordmark as SVG text (the "o" is a dashed ring). It uses
 ## Defense questions
 
 **Q: Why is the dashboard rendered on the server?**
-A: The server already knows the user from the session cookie, so it can load the balance, points, goal count and recent transactions in one database round trip and send ready HTML. The user sees their balance immediately, with no loading spinner and no extra API request.
+A: The server already knows the user from the session cookie, so it can load the balance, points, goal count and recent transactions with one Prisma call (two small SQL statements) and send ready HTML. The user sees their balance immediately, with no loading spinner and no extra API request.
 
 **Q: How did you make the menu accessible?**
 A: It uses the native `<dialog>` element with `showModal()`, which traps focus and closes with Escape. The trigger has `aria-haspopup` and `aria-expanded`, focus returns to the trigger on close, page scrolling is locked while it is open, and all its animations are disabled when the user prefers reduced motion.
