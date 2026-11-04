@@ -3,7 +3,7 @@
 This repository explains **every part of the GoBank Express code**, in study order, so you can understand it deeply and defend it in front of a panel.
 
 - **Source explained:** [`neilacapuccino/gobank-express`](https://github.com/neilacapuccino/gobank-express) at commit `7be1eb5` (the `main` branch on 4 Nov 2026). The exact commit is saved in [`.docs-source.json`](.docs-source.json).
-- **Code excerpts are copied by a script, never retyped.** All 542 excerpts show the real file path and the real line numbers. Run `node scripts/sync-code.mjs --check` to prove that every excerpt still matches the source (see [Keeping these docs accurate](#keeping-these-docs-accurate)).
+- **Code excerpts are copied by a script, never retyped.** All 607 excerpts show the real file path and the real line numbers. Run `node scripts/sync-code.mjs --check` to prove that every excerpt still matches the source (see [Keeping these docs accurate](#keeping-these-docs-accurate)).
 - **Every file is accounted for.** [The file index](appendix/01-file-index.md) lists all 258 files in the project, the category each belongs to, and the page that explains it.
 - **Behavior was verified, not assumed.** See [What was verified](#what-was-verified).
 
@@ -148,7 +148,7 @@ While writing this guide, the source code was not only read but **run**, on an u
 | The app in a real browser | the balance card, the GO menu (focus, Escape, scroll lock, reduced motion) and the session rules (reload, typed address, second tab) checked with Playwright scripts |
 | Live Bitcoin integration test | **not run** (the writing environment blocks the market APIs); run it locally |
 
-The pages themselves are checked too: every excerpt matches the source (`sync-code.mjs --check`), every project file is mentioned (`--coverage`), all internal links and `#anchors` resolve (`check-links.mjs`), and all 46 diagrams parse with Mermaid 11.
+The pages themselves are checked too: every excerpt matches the source (`sync-code.mjs --check`), every project file is mentioned (`--coverage`), all internal links and `#anchors` resolve (`check-links.mjs`), and all 52 diagrams parse with Mermaid 11.
 
 ---
 
