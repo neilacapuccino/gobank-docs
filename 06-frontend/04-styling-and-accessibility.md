@@ -14,7 +14,7 @@
 
 ## 1. Tailwind CSS in one minute
 
-Instead of writing CSS files, components use **utility classes** directly in the markup:
+Instead of writing CSS files, components use **utility classes** directly in the markup (this line is from `balance-card.tsx`, line 69):
 
 ```tsx
 <p className="text-ink-muted text-[13px]">Available balance</p>

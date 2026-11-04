@@ -124,6 +124,8 @@ type Context = { browserSession?: { id: string | null } };
 
 ### Lines 51–59: the `friendlyErrors` middleware
 
+The body of the middleware (lines 52–58 of the excerpt above), with explanatory comments added; the project's code itself has no comments:
+
 ```ts
 const result = await next();         // run everything after this middleware
 if (result.ok) return result;        // success: pass it through

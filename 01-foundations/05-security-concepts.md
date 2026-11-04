@@ -154,7 +154,7 @@ sequenceDiagram
     participant G as GoBank server
     participant Google
     B->>G: GET /api/auth/google
-    G->>G: make random state and verifier; challenge = SHA256(verifier)
+    G->>G: make random state and verifier, challenge = SHA256(verifier)
     G-->>B: set httpOnly cookie (state.verifier.mode) and redirect to Google with state + challenge
     B->>Google: user picks an account and consents
     Google-->>B: redirect to /api/auth/google/callback?code=…&state=…

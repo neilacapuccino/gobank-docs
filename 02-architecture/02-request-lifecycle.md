@@ -39,7 +39,7 @@ sequenceDiagram
     P->>S: sendMoney(...)
     S->>DB: find recipient again, load sender
     S->>L: db.$transaction(transfer)
-    L->>DB: BEGIN; lock both users ORDER BY id
+    L->>DB: BEGIN, then lock both users ORDER BY id
     L->>DB: lock sender, read card + daily total
     L->>DB: UPDATE sender balance −10000 IF balance ≥ 10000
     L->>DB: INSERT Transaction (sender, −10000, "Transfer to @dante")

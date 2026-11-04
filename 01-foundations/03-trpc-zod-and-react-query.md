@@ -8,10 +8,9 @@
 
 In a classic REST API you write an endpoint (`POST /api/transfers`), then separately write browser code that sends JSON to it and *hopes* the shapes match. If the server renames `amount` to `amountCentavos`, the browser breaks at runtime.
 
-**tRPC** lets the browser call server functions as if they were local:
+**tRPC** lets the browser call server functions as if they were local. For example (illustrative values; the real call is in `transfer-form.tsx`, lines 121–126):
 
 ```ts
-// browser
 send.mutate({ to: "@dante", amount: 10000, note: "lunch", card: "physical" });
 ```
 

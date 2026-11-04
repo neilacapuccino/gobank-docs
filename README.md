@@ -1,10 +1,11 @@
-# GoBank Express — Code Study Guide
+# GoBank Express: Code Study Guide
 
 This repository explains **every part of the GoBank Express code**, in study order, so you can understand it deeply and defend it in front of a panel.
 
 - **Source explained:** [`neilacapuccino/gobank-express`](https://github.com/neilacapuccino/gobank-express) at commit `7be1eb5` (the `main` branch on 4 Nov 2026). The exact commit is saved in [`.docs-source.json`](.docs-source.json).
-- **Code excerpts are copied by a script, never retyped.** Every excerpt shows the real file path and the real line numbers. Run `node scripts/sync-code.mjs --check` to prove that every excerpt still matches the source (see [Keeping these docs accurate](#keeping-these-docs-accurate)).
-- **Every file is accounted for.** [The file index](appendix/01-file-index.md) lists all 250+ files in the project, the category each belongs to, and the page that explains it.
+- **Code excerpts are copied by a script, never retyped.** All 255 excerpts show the real file path and the real line numbers. Run `node scripts/sync-code.mjs --check` to prove that every excerpt still matches the source (see [Keeping these docs accurate](#keeping-these-docs-accurate)).
+- **Every file is accounted for.** [The file index](appendix/01-file-index.md) lists all 258 files in the project, the category each belongs to, and the page that explains it.
+- **Behavior was verified, not assumed.** See [What was verified](#what-was-verified).
 
 ---
 
@@ -122,6 +123,26 @@ Already comfortable with Next.js, tRPC and Prisma? Skim section 1 and start at [
 
 ---
 
+## What was verified
+
+While writing this guide, the source code was not only read but **run**, on an untouched copy of commit `7be1eb5`:
+
+| Check | Result |
+| --- | --- |
+| Unit tests (`npm test`) | 63 / 63 pass |
+| Typecheck and lint | pass, zero warnings |
+| All 19 migrations on an empty PostgreSQL 16 | applied cleanly; constraints, indexes and enums match the schema page |
+| Seed script | runs; demo data matches the seed page |
+| Integration test (`verify-core.ts`) | passes on a real database |
+| 20 simultaneous transfers ([experiment](experiments/concurrent-transfers.ts)) | 12 succeed, 8 refused, no money created or lost |
+| Worked examples (interest, Bitcoin, Luhn, formats) | computed by running the project's own functions |
+| The SQL shown for the ledger | captured from PostgreSQL's statement log |
+| Live Bitcoin integration test and browser tests | **not run** (the writing environment blocks the market APIs and has no Google Chrome); run them locally |
+
+The pages themselves are checked too: every excerpt matches the source (`sync-code.mjs --check`), every project file is mentioned (`--coverage`), all internal links and `#anchors` resolve (`check-links.mjs`), and all 21 diagrams parse with Mermaid 11.
+
+---
+
 ## Keeping these docs accurate
 
 Every code block in this guide sits between two markers like these:
@@ -154,6 +175,12 @@ List any project file that no page mentions:
 
 ```bash
 node scripts/sync-code.mjs --coverage
+```
+
+Check every internal link and heading anchor:
+
+```bash
+node scripts/check-links.mjs
 ```
 
 > **Tip:** line numbers in the explanations refer to the numbers printed in the left column of each excerpt, so you can say "line 93 of `ledger.ts`" during the defense and point at it.

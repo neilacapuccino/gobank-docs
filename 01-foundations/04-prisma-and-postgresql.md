@@ -95,7 +95,7 @@ GoBank's 19 migrations tell the story of the project: from one card to two, from
 
 ### Idea 1: Transactions (all-or-nothing)
 
-A **database transaction** groups several statements so they **all succeed or all fail**. A transfer is several writes (debit sender, write sender's history row, credit receiver, write receiver's history row). If anything throws halfway, PostgreSQL **rolls back** every write.
+A **database transaction** groups several statements so they **all succeed or all fail**. A transfer is several writes (debit sender, write sender's history row, credit receiver, write receiver's history row). If anything throws halfway, PostgreSQL **rolls back** every write. This is how `transfers.service.ts` starts one (lines 92–94, shown on one line):
 
 ```ts
 db.$transaction((tx) => transfer(tx, sender, receiver, amount, card, note));

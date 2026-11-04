@@ -568,7 +568,7 @@ A **server** page: it loads the receipt with the server-side tRPC caller. A `NOT
 | 27 | Biller | bill payments |
 | 28 | GoalSave | goal movements |
 | 29–31 | Points | points were earned or used |
-| 33 | **Paid with** Physical · Discover •••• 8954 | card payments ([Cards](04-cards.md#6-paid-with-on-receipts-card-labelts)) |
+| 33 | **Paid with** Physical · Discover •••• 8954 | card payments ([Cards](04-cards.md#6-paid-with--on-receipts-card-labelts)) |
 
 The amount is red for money out and green for money in (line 45). It is formatted by `peso()`, which shows a negative amount as `-₱100.00`. **Done** returns to the dashboard.
 

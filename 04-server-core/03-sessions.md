@@ -533,7 +533,7 @@ Every signed-in page is wrapped in it by `(app)/layout.tsx`, which passes the se
 ```mermaid
 stateDiagram-v2
     [*] --> Active: correct PIN (startSession)<br/>expires in 30 min
-    Active --> Active: tab visible: renewed every 60 s<br/>and on return to the tab
+    Active --> Active: while the tab is visible, renewed every 60 s<br/>and on return to the tab
     Active --> Closing: tab closed or reloaded (pagehide)<br/>expiry shortened to ≤ 15 s
     Closing --> Active: page reloaded within 15 s<br/>(guard renews it)
     Closing --> Ended: no renewal within 15 s
