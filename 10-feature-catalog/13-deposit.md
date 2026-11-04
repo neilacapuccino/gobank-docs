@@ -631,6 +631,41 @@ Because the check and the change are **one statement**, two deposits at the same
 
 ## Tests
 
+- `amount-input.test.ts` (unit), the rules of §1 and §2:
+
+<!-- code: gobank/src/shared/lib/amount-input.test.ts -->
+**`gobank/src/shared/lib/amount-input.test.ts`** · all 20 lines
+
+```ts
+ 1 │ import assert from "node:assert/strict";
+ 2 │ import { test } from "node:test";
+ 3 │ import { isPesoInput } from "./amount-input";
+ 4 │ import { toCentavos } from "./money";
+ 5 │
+ 6 │ void test("half-typed peso amounts are allowed while typing", () => {
+ 7 │   for (const value of ["", ".", ".5", "12.", "12.34"]) {
+ 8 │     assert.equal(isPesoInput(value), true, value);
+ 9 │   }
+10 │ });
+11 │
+12 │ void test("negative, over-precise and formatted amounts are blocked", () => {
+13 │   for (const value of ["-5", "1.234", "1.2.3", "1e3", "1,000"]) {
+14 │     assert.equal(isPesoInput(value), false, value);
+15 │   }
+16 │ });
+17 │
+18 │ void test("pesos convert to whole centavos without rounding errors", () => {
+19 │   assert.equal(toCentavos(Number("12.34")), 1234);
+20 │ });
+```
+<!-- /code -->
+
+| Test | Checks |
+| --- | --- |
+| half-typed peso amounts are allowed while typing | `""`, `"."`, `".5"`, `"12."`, `"12.34"` pass, so the user can type a dot before the decimals |
+| negative, over-precise and formatted amounts are blocked | `"-5"`, `"1.234"`, `"1.2.3"`, `"1e3"`, `"1,000"` are refused |
+| pesos convert to whole centavos without rounding errors | `toCentavos(Number("12.34"))` is exactly `1234` |
+
 - `verify-core.ts` (`checkBillsAndLoad`) calls `deposit(owner.id, 100_000)` (₱1,000) and then checks the balance after a bill and a load: exactly `85_000` centavos.
 - **Checked in a browser for this review** (Chromium, signed in as `@dante`): all the input cases in [§1](#1-keystrokes-that-would-break-the-amount-are-ignored), then a ₱0.29 deposit. The receipt showed ₱0.29, a `GB…` reference, the date and "Balance after ₱10,047.19", and the dashboard's first row became "Cash deposit · Nov 4 · +₱0.29".
 - **Run on the test database for this review:** the SQL and parameters in [§4](#4-one-update-that-checks-and-adds-at-the-same-time), the refused over-cap deposit (rolled back, no history row), and the Zod messages in [§3](#3-the-limit-is-checked-twice-with-one-constant).

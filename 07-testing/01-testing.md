@@ -38,7 +38,7 @@ On commit `7be1eb5`, in a separate copy of the project (the project itself was n
 | `npm run db:seed` | passed |
 | `npm run test:integration` (`verify-core.ts`) | **passed**: "registration, cards, PINs, Google linking, profile, payments, transfers, requests, card locks, ownership, rollback and savings" |
 | Concurrency experiment (20 simultaneous transfers) | **passed**: no overdraft, no money created or lost ([§6](#6-the-concurrency-experiment)) |
-| `npm run test:bitcoin:integration` | **not run**: the environment used to write these docs blocks the Binance and Frankfurter APIs. The script stopped at the first quote with the app's own "Bitcoin market data is unavailable" error, the graceful failure the [Bitcoin page](../05-features/12-bitcoin.md) describes. Run it on a normal internet connection |
+| `npm run test:bitcoin:integration` | **passed with stand-in market data**: "Passed: live Bitcoin quote, chart, fees, idempotency, settlement and rollback." The environment used to write these docs blocks the Binance and Frankfurter APIs. A plain run stopped at the first quote with the app's own "Bitcoin market data is unavailable" error, the graceful failure the [Bitcoin page](../05-features/12-bitcoin.md) describes. It was then run with [`experiments/mock-market.mjs`](../experiments/mock-market.mjs) preloaded, which answers only those four requests with fixed prices. Run it once against the real APIs on a normal internet connection |
 | `npm run test:e2e` | **3 / 3 passed** against the dev server and the local database. The project's config asks for Google Chrome (`channel: "chrome"`), which the writing environment does not have, so the run used a one-off copy of the config that only swaps in the pre-installed Chromium (same 3 tests, same Pixel 7 device). Run it once more with the real config before the defense |
 | Extra browser checks (Playwright scripts, Chromium) | the balance card (hide, copy refused without clipboard permission), the GO menu (focus, Tab, Escape, scroll lock, reduced motion) and the session rules (reload, typed address, second tab, in-app link) behave as the catalog pages [06](../10-feature-catalog/06-sessions-and-sign-out.md), [11](../10-feature-catalog/11-dashboard.md) and [12](../10-feature-catalog/12-go-menu.md) describe |
 
@@ -583,6 +583,8 @@ This script runs the **real services** (the same functions the API calls) agains
 | 75–86 | buying more than the balance fails, the balance is unchanged and **no ledger row** was added |
 | 88–99 | selling everything returns the holdings to 0 and credits exactly the expected proceeds |
 | 104–109 | the fixture user is always deleted |
+
+**Result for these docs:** passed, with [`experiments/mock-market.mjs`](../experiments/mock-market.mjs) preloaded (`NODE_OPTIONS="--import …/mock-market.mjs"`) because the writing environment blocks the market APIs. The stand-in answers only the four market requests, with fixed prices (BTC $100,000, USD→PHP 58.50, so ₱5,850,000.00), so lines 56–59 checked those values instead of live ones. Everything else ran for real on PostgreSQL: the trades, the fees, idempotency, the refused purchase and the settlement.
 
 ## 6. The concurrency experiment
 

@@ -24,6 +24,20 @@ The [section 5 pages](../05-features/01-registration-and-sign-in.md) teach the f
 
 Every code block is copied from the source by `scripts/sync-code.mjs`, with real line numbers.
 
+### How the facts on these pages were checked
+
+Nothing on these pages is guessed from the code alone. Besides the synced code, each page says in its **Tests** section what was actually **run** for this review:
+
+| Kind of check | Examples |
+| --- | --- |
+| **SQL captured from PostgreSQL's log**, with the real parameter values | a deposit's conditional `UPDATE` (13), a whole transfer (14), a goal transfer (27), a points conversion (31), cursor paging (16) |
+| **Races fired at a real database** | two payments of one request (16), 5 payments against ₱100 of daily limit (22), 3 goal creations at the limit (25), interest read three times at once (29), 5 point conversions (31), two "sell everything" (38), 10 + 10 opposite transfers ([experiment](../experiments/opposite-transfers.ts), 14) |
+| **The project's own functions** on worked examples | rounding (13), Luhn (19), CVV encryption and tampering (20), interest (29), chart geometry (36), trade math (38) |
+| **The app in a real browser** (Chromium, Playwright, the app on a local database) | every screen from the dashboard to Bitcoin: what is shown, which buttons are enabled, `aria-*` values, focus and keyboard behavior |
+| **Stand-in market data** for Bitcoin (35–39) | the environment blocks the market APIs, so [`experiments/mock-market.mjs`](../experiments/mock-market.mjs) answers those four requests with fixed prices; everything else ran for real |
+
+Where a check found a problem, the page says so and the problem is listed in [Limitations and future work](../09-defense/03-limitations-and-future-work.md). Examples: dates formatted in the server's time zone (11, 34), an ambiguous recipient search (14), the CVV sent without `no-store` (20), two different progress numbers (24, 26), interest lines of closed goals (28).
+
 ---
 
 ## All features

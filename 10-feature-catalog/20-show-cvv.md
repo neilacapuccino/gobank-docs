@@ -501,6 +501,82 @@ What happened for each case, run for this review (the CVV was encrypted for card
 
 The file starts with `import "server-only"`: if browser code ever imported it, the **build** would fail, so the key and the decryption code can never be shipped to the browser.
 
+**Creating the key:** `npm run card:setup-key` runs this script once per environment:
+
+<!-- code: gobank/scripts/setup-card-key.ts -->
+**`gobank/scripts/setup-card-key.ts`** · all 59 lines
+
+```ts
+ 1 │ import { spawnSync } from "node:child_process";
+ 2 │ import { randomBytes } from "node:crypto";
+ 3 │ import { appendFile, readFile } from "node:fs/promises";
+ 4 │ import { fileURLToPath } from "node:url";
+ 5 │
+ 6 │ const appDirectory = fileURLToPath(new URL("../", import.meta.url));
+ 7 │ const environmentFile = new URL("../.env", import.meta.url);
+ 8 │
+ 9 │ const KEY_LINE = /^\s*(?:export\s+)?CARD_ENCRYPTION_KEY\s*=/m;
+10 │
+11 │ const isMissingFile = (error: unknown) =>
+12 │   typeof error === "object" &&
+13 │   error !== null &&
+14 │   "code" in error &&
+15 │   error.code === "ENOENT";
+16 │
+17 │ async function readEnvironmentFile() {
+18 │   try {
+19 │     return await readFile(environmentFile, "utf8");
+20 │   } catch (error) {
+21 │     if (isMissingFile(error)) return "";
+22 │     throw error;
+23 │   }
+24 │ }
+25 │
+26 │ function envFileIsIgnoredByGit() {
+27 │   const result = spawnSync("git", ["check-ignore", "--quiet", ".env"], {
+28 │     cwd: appDirectory,
+29 │   });
+30 │
+31 │   return result.status === 0;
+32 │ }
+33 │
+34 │ const existing = await readEnvironmentFile();
+35 │ const keyAlreadySet =
+36 │   Boolean(process.env.CARD_ENCRYPTION_KEY) || KEY_LINE.test(existing);
+37 │
+38 │ if (keyAlreadySet) {
+39 │   console.log("CARD_ENCRYPTION_KEY already exists; no changes made.");
+40 │ } else {
+41 │   if (!envFileIsIgnoredByGit()) {
+42 │     throw new Error(
+43 │       "Keep .env ignored by Git before configuring card encryption.",
+44 │     );
+45 │   }
+46 │
+47 │   const newKey = randomBytes(32).toString("hex");
+48 │   const startsOnNewLine = existing.length > 0 && !existing.endsWith("\n");
+49 │
+50 │   await appendFile(
+51 │     environmentFile,
+52 │     `${startsOnNewLine ? "\n" : ""}CARD_ENCRYPTION_KEY="${newKey}"\n`,
+53 │     { mode: 0o600 },
+54 │   );
+55 │
+56 │   console.log(
+57 │     "Card encryption configured locally. Reuse the same private key for every app sharing this database.",
+58 │   );
+59 │ }
+```
+<!-- /code -->
+
+| Step | Lines | Why |
+| --- | --- | --- |
+| a key already in the environment or in `.env` → change nothing | 34–39 | a second run must never replace the key: every CVV encrypted with the old key would become unreadable |
+| `git check-ignore --quiet .env` must succeed | 26–32, 41–45 | refuses to write a secret into a file that Git would commit ("Keep .env ignored by Git before configuring card encryption.") |
+| `randomBytes(32).toString("hex")` | 47 | 32 random bytes = the 64 hex characters `env.ts` expects |
+| append `CARD_ENCRYPTION_KEY="…"` with file mode `0o600` | 48–54 | only the file's owner can read it, and a missing newline is added first |
+| "Reuse the same private key for every app sharing this database." | 56–58 | two servers with different keys could not read each other's CVVs |
+
 ### 4. Ignoring answers that arrive too late
 
 <!-- code: gobank/src/features/card/hooks/use-card-secrets.ts 40-62 -->

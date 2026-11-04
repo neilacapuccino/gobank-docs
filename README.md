@@ -3,7 +3,7 @@
 This repository explains **every part of the GoBank Express code**, in study order, so you can understand it deeply and defend it in front of a panel.
 
 - **Source explained:** [`neilacapuccino/gobank-express`](https://github.com/neilacapuccino/gobank-express) at commit `7be1eb5` (the `main` branch on 4 Nov 2026). The exact commit is saved in [`.docs-source.json`](.docs-source.json).
-- **Code excerpts are copied by a script, never retyped.** All 653 excerpts show the real file path and the real line numbers. Run `node scripts/sync-code.mjs --check` to prove that every excerpt still matches the source (see [Keeping these docs accurate](#keeping-these-docs-accurate)).
+- **Code excerpts are copied by a script, never retyped.** All 724 excerpts show the real file path and the real line numbers. Run `node scripts/sync-code.mjs --check` to prove that every excerpt still matches the source (see [Keeping these docs accurate](#keeping-these-docs-accurate)).
 - **Every file is accounted for.** [The file index](appendix/01-file-index.md) lists all 258 files in the project, the category each belongs to, and the page that explains it.
 - **Behavior was verified, not assumed.** See [What was verified](#what-was-verified).
 
@@ -143,12 +143,14 @@ While writing this guide, the source code was not only read but **run**, on an u
 | 20 simultaneous transfers ([experiment](experiments/concurrent-transfers.ts)) | 12 succeed, 8 refused, no money created or lost |
 | 10 + 10 opposite transfers at once ([experiment](experiments/opposite-transfers.ts)) | all 20 succeed, 0 deadlocks |
 | Worked examples (interest, Bitcoin, Luhn, formats) | computed by running the project's own functions |
-| The SQL shown for the ledger | captured from PostgreSQL's statement log |
+| The SQL shown for the ledger and the features | captured from PostgreSQL's statement log, with the real parameter values |
+| Races on a real database | two payments of one request, 5 payments against ₱100 of daily limit, 3 goal creations at the limit, simultaneous interest reads, 5 point conversions: in every case exactly the allowed number succeeded and nothing was paid twice ([catalog](10-feature-catalog/README.md#how-the-facts-on-these-pages-were-checked)) |
 | Browser tests (`npm run test:e2e`) | **3 / 3 pass** in Chromium (the config's Google Chrome is not installed here, so a copy of the config swapped in Chromium) |
-| The app in a real browser | the balance card, the GO menu (focus, Escape, scroll lock, reduced motion) and the session rules (reload, typed address, second tab) checked with Playwright scripts |
-| Live Bitcoin integration test | **not run** (the writing environment blocks the market APIs); run it locally |
+| The app in a real browser | the screens of [catalog pages 11–39](10-feature-catalog/README.md) (dashboard, GO menu, every payment, cards, GoalSave, rewards, history, receipts, Bitcoin) driven with Playwright scripts in Chromium: what is shown, which buttons are enabled, the `aria-*` values, focus and keyboard behavior; plus the session rules (reload, typed address, second tab). The welcome and sign-in screens are covered by the 3 browser tests; registration, Google linking and the profile screens (pages 01–10) were checked against the code, not in a browser |
+| Bitcoin integration test (`verify-bitcoin.ts`) | **passes with stand-in market data** ([`experiments/mock-market.mjs`](experiments/mock-market.mjs) answers the 4 blocked API calls with fixed prices); not yet run against the live APIs |
+| Bitcoin trading, end to end | with the same stand-in data: real buys and sells on the database, a repeated submission ID never trades twice, two simultaneous "sell everything" → one refused; the whole screen in Chromium |
 
-The pages themselves are checked too: every excerpt matches the source (`sync-code.mjs --check`), every project file is mentioned (`--coverage`), all internal links and `#anchors` resolve (`check-links.mjs`), and all 57 diagrams parse with Mermaid 11.
+The pages themselves are checked too: every excerpt matches the source (`sync-code.mjs --check`), every project file is mentioned (`--coverage`), all internal links and `#anchors` resolve (`check-links.mjs`), and all 62 diagrams parse with Mermaid 11.
 
 ---
 

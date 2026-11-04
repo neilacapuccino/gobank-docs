@@ -11,6 +11,7 @@ Every feature page in this catalog uses the same building blocks. This page summ
 | API transport | `gobank/src/app/api/trpc/[trpc]/route.ts`, `gobank/src/trpc/react.tsx` | carries every browser call to the server | [Life of a request](../02-architecture/02-request-lifecycle.md) |
 | API definition | `gobank/src/server/trpc.ts`, `gobank/src/server/root.ts` | procedures, middleware, error translation, sign-in guard | [tRPC setup](../04-server-core/02-trpc-setup.md) |
 | Sessions | `gobank/src/server/session.ts`, `session-guard.tsx`, `session.client.ts` | who is signed in, in which tab, until when | [Sessions](../04-server-core/03-sessions.md) |
+| Database client | `gobank/src/server/db.ts`; schema `gobank/prisma/schema.prisma`; migrations `gobank/prisma/migrations/*` (+ `migration_lock.toml`, which records `provider = "postgresql"`) | one Prisma client for the whole server | [DB, errors, IDs, pagination](../04-server-core/01-db-errors-identifiers-pagination.md) |
 | **Ledger** | `gobank/src/server/ledger.ts` | **the only code that changes balances** | [The ledger](../04-server-core/04-ledger.md) |
 | Errors | `gobank/src/server/errors.ts` | `fail()`, `AppError`, every user message | [DB, errors, IDs, pagination](../04-server-core/01-db-errors-identifiers-pagination.md) |
 | Validation | `gobank/src/shared/lib/schemas.ts` + each router | Zod checks every input | [tRPC, Zod and React Query](../01-foundations/03-trpc-zod-and-react-query.md) |
@@ -238,6 +239,41 @@ flowchart LR
 <!-- /code -->
 
 After **any** mutation (except sign-in-related ones), every cached query is marked stale, so the balance, history, points and limits shown anywhere are reloaded the next time they are on screen.
+
+### 5. One database client for the whole server
+
+<!-- code: gobank/src/server/db.ts -->
+**`gobank/src/server/db.ts`** · all 17 lines
+
+```ts
+ 1 │ import "server-only";
+ 2 │
+ 3 │ import { env } from "~/env";
+ 4 │ import { PrismaClient } from "../../generated/prisma";
+ 5 │
+ 6 │ const createPrismaClient = () =>
+ 7 │   new PrismaClient({
+ 8 │     log: env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+ 9 │   });
+10 │
+11 │ const globalForPrisma = globalThis as unknown as {
+12 │   prisma: ReturnType<typeof createPrismaClient> | undefined;
+13 │ };
+14 │
+15 │ export const db = globalForPrisma.prisma ?? createPrismaClient();
+16 │
+17 │ if (env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+```
+<!-- /code -->
+
+| Line | Effect |
+| --- | --- |
+| 1 | `import "server-only"`: importing the database client into browser code fails the build |
+| 6–9 | logs Prisma errors (and warnings in development). Normal refusals are logged too, see [Limitations](../09-defense/03-limitations-and-future-work.md#4-technical-limitations) |
+| 11–15 | reuse a client stored on `globalThis` if there is one |
+| 17 | outside production, store it there |
+
+In development, Next.js reloads changed modules without restarting the process. Without lines 11–17, every reload would create a **new** `PrismaClient` with its own pool of database connections, and the database would soon refuse new connections. Every service imports this one `db`. Code that must run inside a transaction receives `tx` instead ([13 §5](13-deposit.md#5-why-the-service-wraps-a-single-call-in-a-transaction)).
 
 ---
 
