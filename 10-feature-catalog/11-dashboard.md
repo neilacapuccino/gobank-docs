@@ -890,6 +890,8 @@ flowchart LR
 
 Nothing is written by this feature.
 
+The transaction query is fast because of the index `@@index([userId, createdAt(sort: Desc)])` on `Transaction` (schema.prisma): PostgreSQL can jump to this user's newest rows and stop after 5, instead of reading and sorting the whole history.
+
 ## The complicated parts, explained step by step
 
 ### 1. One Prisma call, two SQL statements

@@ -180,6 +180,8 @@ Only `id`, `username`, `fullName` and `profilePhoto`. Never their balance, accou
 
 Everything is lowercased and trimmed first. Gmail matching is restricted to *linked* Gmails because only those were verified through Google; an unverified address typed into a profile could otherwise be used to impersonate someone.
 
+Without `@`, all the conditions are joined with `OR`. Usernames may be digits only, so a username can equal another person's mobile or account number. In that case two rows match, `findFirst` has no `orderBy`, and either account may come back. This was tested on a real database; see the [catalog page](../10-feature-catalog/14-send-money.md#1-one-search-box-many-ways-to-find-someone). The match card always shows the name and `@username` before **Continue**, and the send step uses that exact `@username`.
+
 ### `findRecipient` (lines 39–49)
 
 `findFirst` with the conditions above. Not found → `NOT_FOUND` "No GoBank account matches that". Yourself → `BAD_REQUEST` "That is your own account". `requestMoney` reuses this function, so requests follow exactly the same rules.

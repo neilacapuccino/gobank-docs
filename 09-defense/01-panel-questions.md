@@ -154,7 +154,7 @@ A group of operations that all succeed or all fail. Every money movement uses on
 It locks the selected rows until the transaction ends, so other transactions that want to change them must wait. We use it on the account before checking the daily limit, on both accounts in a transfer, and on the PIN attempt counter.
 
 **44. How do you avoid deadlocks?**
-A transfer locks both accounts in a fixed order (by ID) at the start, so two opposite transfers request locks in the same order and one simply waits.
+A transfer locks both accounts in a fixed order (by ID) at the start, so two opposite transfers request locks in the same order and one simply waits. We measured it: 10 transfers each way fired at the same moment all succeeded, with no deadlock. *Where:* `ledger.ts` lines 179–183; `experiments/opposite-transfers.ts` in the docs repo.
 
 **45. How is the daily limit computed?**
 The sum of today's outgoing transfers, bills and load since midnight **Manila time**, plus the new payment, must not exceed the limit (default ₱20,000, max ₱100,000, ₱0 blocks spending). It is checked inside the transaction while the account is locked. *Where:* `ledger.ts`, `spentToday`, `spend`.

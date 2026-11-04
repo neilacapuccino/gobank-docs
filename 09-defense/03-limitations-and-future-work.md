@@ -54,7 +54,9 @@
 | **Session cleanup is lazy** | expired sessions are removed when used or at the next sign-in; the close timer may not run on serverless | a scheduled cleanup job (correctness does not depend on it) |
 | **Profile photos stored in the database** | at most ~200 KB per user; fine for a prototype | object storage (for example S3) with only a URL in the database |
 | **Time zones** | the daily limit resets at Manila midnight on the server; history day labels use the device's time zone; but the dashboard's "Recent transactions" dates are formatted **on the server** (`shortDate` has no `timeZone` option), so on a UTC server a transaction at 7:30 AM Manila time shows the previous day there | pass `timeZone: "Asia/Manila"` to the date formatters; store the user's time zone if users travel |
+| **Ambiguous recipient search** | usernames may be digits only, so a username can equal someone else's mobile or account number; a search without `@` then matches two accounts and `findFirst` (no `orderBy`) may return either. Tested: with a user named `09181234567`, typing `09181234567` found @dante. The match card shows the name and `@username` before Continue, so nothing is sent unseen | refuse all-digit usernames, or rank the alternatives (account number, then mobile, then username) |
 | **Market-data caches are per server instance** | each instance fetches its own quotes (5-second cache) | a shared cache such as Redis if traffic grows |
+| **Normal refusals are logged as errors** | `db.ts` turns on Prisma's `"error"` log in every environment. A refused payment (for example a deposit over the balance cap) makes the conditional `UPDATE` match no row (`P2025`); the app catches that and shows a friendly message, but Prisma has already printed a `prisma:error` block to the server log (seen while capturing the SQL for these docs) | log through Prisma events (`emit: "event"`) and skip `P2025`, so real errors stand out |
 
 ## 5. Testing limitations
 

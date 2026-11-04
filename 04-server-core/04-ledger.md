@@ -536,7 +536,7 @@ Writes the `interest` row. Interest goes into the **goal**, not the main balance
 | --- | --- |
 | **Double tap on "Send"** | The UI ignores the second tap while the first is pending. Even if both reach the server, `spend()` locks the account, so they run one after the other, and the second is checked against the reduced balance and today's new total |
 | **20 payments at the same instant** | Measured: 20 × ₱400 from ₱5,000 → exactly 12 succeeded, 8 "Insufficient balance", final ₱200, total money unchanged ([experiment](../experiments/concurrent-transfers.ts)) |
-| **Ana → Ben and Ben → Ana at the same time** | Both lock the two rows in ID order, so one waits and then proceeds. No deadlock |
+| **Ana → Ben and Ben → Ana at the same time** | Both lock the two rows in ID order, so one waits and then proceeds. No deadlock. Measured: 10 transfers each way fired at once → all 20 succeeded, 0 deadlocks, both balances unchanged ([experiment](../experiments/opposite-transfers.ts)) |
 | **Server crash halfway through a transfer** | No `COMMIT` → PostgreSQL rolls back both balance updates and both history rows |
 | **Receiver's balance at the maximum** | The receiver's `post()` fails ("exceed the account limit") → the sender's debit is rolled back too |
 | **Paying with a locked card** | Refused before any money moves; the other card still works |

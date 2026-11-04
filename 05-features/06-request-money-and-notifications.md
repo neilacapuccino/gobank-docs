@@ -193,7 +193,7 @@ Finds the payer with the same `findRecipient` as Send money (so you cannot reque
 | 47–54 | run the normal **`transfer()`** from the payer to the requester with the chosen card and the request's note | card lock, daily limit, balance and points all apply |
 | 56–59 | save the transfer's reference on the request, so the request can link to its receipt | |
 
-> **Why can a request never be paid twice?** Two "Pay" taps (or two devices) both try the `updateMany … WHERE status = 'pending'`. PostgreSQL locks the row for the first update; the second waits, then re-checks the condition, finds `paid`, matches no row, and fails with "This request is no longer open". The integration test does exactly this.
+> **Why can a request never be paid twice?** Two "Pay" taps (or two devices) both try the `updateMany … WHERE status = 'pending'`. PostgreSQL locks the row for the first update; the second waits, then re-checks the condition, finds `paid`, matches no row, and fails with "This request is no longer open". The integration test pays the same request twice **in a row** (the second is refused). The **simultaneous** case was also run for these docs: two payments of one request fired at the same moment → one paid, one refused, money moved once ([catalog page 16](../10-feature-catalog/16-request-inbox.md)).
 
 > **What if the payer cannot afford it?** The status was set to `paid` *inside* the transaction, but `transfer()` then fails ("Insufficient balance"), so the whole transaction rolls back and the request is **still pending**. The payer can try again later or decline.
 

@@ -588,6 +588,8 @@ This script runs the **real services** (the same functions the API calls) agains
 
 Not part of the project, but included in this docs repository: [`experiments/concurrent-transfers.ts`](../experiments/concurrent-transfers.ts). It fires **20 transfers of ₱400 at the same moment** from an account holding ₱5,000 and checks that only the affordable ones succeed and that the total money in both accounts is unchanged. Result on PostgreSQL 16: **12 succeeded, 8 refused with "Insufficient balance", final balance ₱200, money before and after equal.** See [Prisma and PostgreSQL §5](../01-foundations/04-prisma-and-postgresql.md#5-proof-it-works) for the output and how to run it.
 
+A second experiment, [`experiments/opposite-transfers.ts`](../experiments/opposite-transfers.ts), fires **10 transfers @maricel → @dante and 10 @dante → @maricel at the same moment**, the classic deadlock case. Result: **all 20 succeeded, 0 deadlocks** (PostgreSQL logged no "deadlock detected"), both balances unchanged, in about 300 ms. The output and the explanation are in [Send money §4](../10-feature-catalog/14-send-money.md#4-locking-both-accounts-in-id-order-no-deadlocks).
+
 ## 7. Browser tests: `e2e/smoke.spec.ts`
 
 <!-- code: gobank/e2e/smoke.spec.ts -->
