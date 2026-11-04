@@ -792,9 +792,12 @@ In `createRegisteredAccount` (auth.service.ts lines 54–85):
 | At least 3 characters / At most 20 characters / Letters, numbers and underscore only | username rules | `auth.rules.ts` |
 | This name is reserved | reserved username | `auth.rules.ts` |
 | Already taken / Could not check this username. | server answer / network error | `use-username-check.ts` |
-| Use 6 digits / Avoid repeating the same digit / Avoid sequences like 123456 | PIN rules | `auth.rules.ts` |
-| Those did not match. Start again. | PIN confirmation mismatch | `step-identity.tsx` |
-| Enter your full name / Use at most 80 characters / Use the format 09XXXXXXXXX | details | `contact.ts` |
+| Avoid repeating the same digit / Avoid sequences like 123456 (also for `987654`) | PIN rules, shown under the pad (checked in Chromium) | `auth.rules.ts` |
+| Those did not match. Start again. | PIN confirmation mismatch; PIN creation starts over (checked in Chromium) | `step-identity.tsx` |
+| Use the format 09XXXXXXXXX | an invalid mobile, shown under the field | `contact.ts` |
+| (no message) | a full name shorter than 2 characters: **Continue** just stays disabled (`profileIsValid`); the field cannot take more than 80 characters (`maxLength`) | `profile-fields.tsx` |
+
+The PIN messages are a plain `<p>` without `role="status"`, so unlike the same messages in sign-in and change PIN, a screen reader does not announce them ([Limitations](../09-defense/03-limitations-and-future-work.md#3-product-and-ux-limitations)).
 | Preparing card… / Preparing your card details… / Opening your account | progress | registration components |
 | Refresh your card details before confirming. | preview expired or network mismatch | `card-preview.service.ts` |
 | This card preview has already been used. | preview consumed twice | `card-preview.service.ts` |
@@ -808,3 +811,17 @@ In `createRegisteredAccount` (auth.service.ts lines 54–85):
 | `auth.test.ts` | username cleaning and reserved names; PIN rules; salted scrypt hashes |
 | `card-cvv.test.ts` | card numbers (prefix, 16 digits, Luhn), different virtual network, CVV encryption |
 | `verify-core.ts` → `checkRegistrationAndPin` | real registration: physical card = preview, two different cards and CVVs, encrypted CVV never returned, PIN verifies, **a used preview cannot register again** |
+
+**Checked in Chromium for this review** (a new account created on the local database through the real screens):
+
+| Step | Seen |
+| --- | --- |
+| username `ab` / `admin` / `dante` | "At least 3 characters" / "This name is reserved" / "Already taken"; **Continue** disabled |
+| typing `Dan Te!` | the field shows `dante` (capitals, spaces and symbols removed) |
+| a free username | **Continue** enabled |
+| PIN `123456`, `987654`, `111111` | "Avoid sequences like 123456" (both), "Avoid repeating the same digit"; still "Create your PIN" |
+| PIN `246813`, then `246814` | "Confirm your PIN", then "Those did not match. Start again." and back to "Create your PIN" |
+| card step | Visa, Mastercard, JCB, Discover; **Discover** pressed by default |
+| details: name `R`, mobile `12345` | "Use the format 09XXXXXXXXX" under the mobile; no message for the name; **Continue** disabled |
+| review | @username · PIN `••••••` · Card Visa · CVV `•••` · Full name · Mobile `0917 555 0123`; **Create my account** disabled until the terms box is ticked |
+| result | the dashboard with ₱0.00; in the database: mobile `09175550123`, daily limit ₱20,000, a physical **Visa** (`4242…`) and a virtual **Mastercard** (`5555…`) |

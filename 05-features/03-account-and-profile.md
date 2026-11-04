@@ -246,7 +246,7 @@ The name shown on the profile: the full name, or `@username` if there is no name
 | `normalizeGmail` (26–30) | lowercase; must be `@gmail.com` or `@googlemail.com`, starting with a letter or digit | `Juan.Dela.Cruz@Gmail.com` → `juan.dela.cruz@gmail.com`; `x@school.edu` → `null` |
 | `formatMobile` (32–37) | display as `0917 123 4567` | |
 
-These run in the browser (instant messages) and on the server (inside the Zod `mobile` and `profileFields` schemas in `shared/lib/schemas.ts`), so both sides apply exactly the same rules.
+`validateMobile` runs in the browser (an instant message under the field) **and** on the server (inside the Zod `mobile` schema in `shared/lib/schemas.ts`). `validateFullName` runs only in the browser and only as a yes/no check: `profileIsValid` disables the button, and its messages are never displayed. The server applies the same 2–80 rule with its own schema (`profileFields`: `min(2, "Enter your full name").max(80)`). Both sides apply the same rules; only the mobile has a visible message in the form.
 
 ---
 

@@ -401,3 +401,5 @@ Re-encoding drops the original **metadata**: EXIF (which can include the GPS loc
 <!-- /code -->
 
 Plus `verify-core.ts`: a real PNG is saved as WebP; a broken photo is refused and **nothing else in the request is saved**.
+
+**Checked in Chromium for this review:** a 400 × 300 PNG was chosen with the picker. The preview appeared at once, with **Change photo** and **Remove**. After **Save changes**, the settings screen showed the photo, and the database held a `data:image/webp;base64,…` value. Decoded with sharp, it was a **256 × 256 WebP of 1,012 bytes, with no EXIF and no color profile**. **Remove** changed the button to **Add photo** but kept the stored photo until **Save changes**. After saving, the column was `NULL` and the default icon was back.

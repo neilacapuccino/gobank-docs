@@ -417,3 +417,13 @@ Two details to notice:
 | `auth.test.ts` | lock lasts exactly 15 minutes and counts down; right PIN matches, wrong does not; broken hashes never match |
 | `verify-core.ts` | a wrong PIN is refused with the right message; the correct one passes |
 | `e2e/smoke.spec.ts` | the demo user signs in through the real UI and reaches the dashboard |
+
+**Checked in Chromium for this review** (the account created on page 02):
+
+| Attempt | Message | `failedPinAttempts`, locked? |
+| --- | --- | --- |
+| typing `@ZZReg…` in the username box | the field shows the cleaned `zzreg…` | |
+| wrong PIN #1–#4 | "Wrong username or PIN" | 1, 2, 3, 4 · no |
+| wrong PIN #5 | **"Too many wrong PINs. Try again in 15 minutes."** | **0 · yes**, as in the trace in [§1](#1-the-lockout-transaction) |
+| the **correct** PIN during the lock | the same lock message; still on `/signin` | |
+| after resetting the lock in the database (for the test) and the correct PIN | the dashboard | |

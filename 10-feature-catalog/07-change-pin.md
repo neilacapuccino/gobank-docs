@@ -341,3 +341,14 @@ Line 58 ignores taps while saving; line 59 clears an old error when the user sta
 ## Tests
 
 `auth.test.ts`: a new PIN must be different from the current one (`pinChange`); PIN rules; hashing the same PIN twice gives different hashes; only the right PIN verifies.
+
+**Checked in Chromium for this review:**
+
+| Entered | Screen afterwards | Message |
+| --- | --- | --- |
+| current `111111` (wrong), new `135791`, confirm `135791` | back to "Enter your current PIN" | **"That PIN is not right"** (checked on the server, at the end) |
+| current `246813`, new `246813` | stays on "Choose a new PIN" | **"Choose a different PIN"** (checked in the browser) |
+| new `135791`, confirm `135792` | back to "Choose a new PIN" | "Those did not match. Start again." |
+| new `135791`, confirm `135791` | "PIN changed" | "Use your new PIN next time you sign in. Any other devices have been signed out." |
+
+Afterwards the user had exactly **1** session (this tab), and the new PIN worked for the next sign-in.

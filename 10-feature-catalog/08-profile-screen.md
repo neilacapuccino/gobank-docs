@@ -351,3 +351,5 @@ return { ...details, gmail: googleId ? details.gmail : null };
 ## Tests
 
 `verify-core.ts` reads `getProfile` after saving a profile (name and WebP photo) and after linking Google (the Gmail appears), and checks that another user's profile is unaffected.
+
+**Checked in Chromium for this review** (a newly registered account): name and `@username`, Account number `2071 5305 146` (grouped by 4), Mobile `0917 555 0123`, Gmail **Not set**, Member since **November 2026**, the four shortcuts and **Sign out**, and the default icon announced as "Default profile icon" (`role="img"`). After a photo was saved ([10](10-profile-photo.md)), the photo replaced the icon.

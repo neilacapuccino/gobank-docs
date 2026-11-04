@@ -367,7 +367,7 @@ If another user already has the number, the update fails on the unique constrain
 
 | Message | When |
 | --- | --- |
-| Enter your full name / Use at most 80 characters | name too short / long |
+| (no message in the form) | a name shorter than 2 characters keeps **Save changes** disabled; more than 80 cannot be typed (`maxLength`). "Enter your full name" only comes back from the **server** if the API is called directly with a short name |
 | Use the format 09XXXXXXXXX | invalid mobile |
 | That mobile is already taken | another account has it |
 | Saving / Save changes | button |
@@ -375,3 +375,13 @@ If another user already has the number, the update fails on the unique constrain
 ## Tests
 
 `verify-core.ts` → `checkProfile`: a valid update saves the name and a WebP photo; an update with a broken photo is rejected and **nothing changes, not even the name sent in the same request**; another user's profile is unaffected.
+
+**Checked in Chromium for this review:**
+
+| Action | Result |
+| --- | --- |
+| open the form | it starts with the saved name and mobile |
+| name `R` | **Save changes** disabled; no message is shown for the name |
+| mobile `12345` | "Use the format 09XXXXXXXXX"; disabled |
+| new name + Dante's mobile, **Save changes** | **"That mobile is already taken"**, and the new name was **not** saved either (one statement) |
+| new name, mobile `+63 917 555 0199`, **Save changes** | back on `/settings`, showing the new name and `0917 555 0199`; stored as `09175550199` |
