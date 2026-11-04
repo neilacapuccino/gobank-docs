@@ -219,18 +219,31 @@ GoBank uses **cursor pagination**: "give me the next 20 rows *after this row's I
 | 7 | Keep only `limit` rows. |
 | 8 | If there was an extra row, the next cursor is the ID of the last row we kept; otherwise `null` (no more pages). |
 
-How it is used (from `activity.service.ts`):
+How it is used, in the transaction history service:
+
+<!-- code: gobank/src/features/activity/activity.service.ts 6-20 -->
+**`gobank/src/features/activity/activity.service.ts`** · lines 6–20
 
 ```ts
-const rows = await db.transaction.findMany({
-  where: { userId, … },
-  orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-  ...pageArgs(cursor, limit),
-});
-return toPage(rows, limit);   // { items, next }
+ 6 │ export async function listActivity(
+ 7 │   userId: string,
+ 8 │   cursor: string | null | undefined,
+ 9 │   limit: number,
+10 │   filter: ActivityFilter = "all",
+11 │ ) {
+12 │   const rows = await db.transaction.findMany({
+13 │     where: { userId, kind: MAIN_ACCOUNT_KINDS, ...filterWhere(filter) },
+14 │     select: activityFields,
+15 │     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+16 │     ...pageArgs(cursor, limit),
+17 │   });
+18 │
+19 │   return toPage(rows, limit);
+20 │ }
 ```
+<!-- /code -->
 
-In the browser, `useInfiniteQuery` passes `page.next` as the next cursor when the user taps **Load more**.
+Line 16 spreads `pageArgs` into the query, and line 19 returns `{ items, next }`. In the browser, `useInfiniteQuery` passes `page.next` as the cursor of the next request when the user taps **Load more** ([Transactions and receipts](../05-features/10-transactions-and-receipts.md)). The same pair of helpers pages the reward history; the notifications list uses `toPage` with its own cursor query.
 
 > **Why cursors instead of page numbers?** With `OFFSET 40`, if three new transactions arrive while you scroll, every page shifts and you see duplicates. A cursor says "after this exact row", so new rows at the top do not disturb the pages you are loading. The second sort key `id` breaks ties when two rows share the same `createdAt`, so the order is always stable.
 
