@@ -29,6 +29,7 @@
 | **No general rate limiting** | spam on public endpoints (card previews, username checks) | a rate limiter at the edge or in a middleware |
 | **No security headers** (Content-Security-Policy, `frame-ancestors`) | clickjacking; weaker XSS defense | `headers()` in `next.config.ts` |
 | **Card numbers stored in plain text** | fine for simulated cards; not PCI DSS compliant | tokenize or encrypt like the CVV |
+| **The decrypted CVV is sent without `Cache-Control: no-store`** | `card.revealCvv` is a GET query, and the response carries no `Cache-Control` header (checked in Chromium). A browser does not reuse such a response, but it is allowed to keep a copy in its disk cache | add `Cache-Control: no-store` for sensitive procedures (tRPC's `responseMeta`), or fetch the CVV with a mutation (POST) |
 | **No encryption-key rotation** | a leaked key exposes all CVVs | `v2` ciphertexts with a new key; re-encrypt in the background |
 | **"Idle" = tab hidden**, not "no interaction" | an unattended, visible tab stays signed in | an inactivity timer in `SessionGuard` |
 | **No security event log** | sign-ins and failures are not auditable | a `SecurityEvent` table |
@@ -44,6 +45,7 @@
 | **Lifetime reward totals unused** | the API computes them but the screen does not show them | show them, or remove them from `getRewardsSummary` |
 | **Balance-hide choice not remembered** | resets on reload | remember the preference per device |
 | **Default 404 page** | no custom "not found" page | add `app/not-found.tsx` |
+| **Labels on elements without a role** | 8 plain `div`/`span`/`p` elements carry an `aria-label` but no `role`, for example the load presets ("Load amounts"), the request and activity switches, the chart range buttons, and the card number `<p>` whose visible digits are `aria-hidden`. Chromium exposes the names (checked: `role=generic name="Load amounts"`, `role=paragraph name="Card number hidden"`), but ARIA 1.2 does not allow naming the `generic` and `paragraph` roles, so screen readers may skip them | `role="group"` on button groups, `role="img"` (or visually hidden text) for the card number, and a test with a real screen reader |
 
 ## 4. Technical limitations
 

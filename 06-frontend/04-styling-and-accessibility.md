@@ -328,6 +328,8 @@ GoBank is **mobile-first**: the layout is designed for a phone and simply center
 | **No forced motion** | motion sensitivity | `prefers-reduced-motion` everywhere |
 | **Readable inputs** | iPhones zoom into small inputs | 16 px input text |
 
+**Known gap.** A few labels sit on elements that have no role: plain `div`s around button groups ("Load amounts", "Request direction", "Activity filter", "Chart time range"), the card's "Physical card" and "Card security code" boxes, the "Checking username" spinner, and the card number `<p>`. Chromium shows these names in its accessibility tree, but ARIA 1.2 does not allow names on the `generic` and `paragraph` roles, so a screen reader may not read them. Adding `role="group"` (button groups) or `role="img"` (the card number, the spinner) would fix it. See [Limitations](../09-defense/03-limitations-and-future-work.md#3-product-and-ux-limitations).
+
 ---
 
 ## Defense questions
